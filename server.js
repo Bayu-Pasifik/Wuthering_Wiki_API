@@ -1,17 +1,15 @@
 const express = require('express');
 const app = express();
-const PORT = 9000;
+const port = process.env.PORT || 9000;
 
-// Import routes
+app.get('/', (req, res) => {
+    res.send('Hello, World!');
+});
+
+// Import dan setup route
 const resonatorRoutes = require('./routes/resonatorRoutes');
+app.use('/api/resonators', resonatorRoutes);
 
-// Middleware
-app.use(express.json());
-
-// Register routes
-app.use('/resonator', resonatorRoutes);
-
-// Jalankan server
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
 });
