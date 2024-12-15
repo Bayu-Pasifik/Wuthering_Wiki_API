@@ -6,14 +6,26 @@ module.exports = ($, url, name) => {
     const weaponIcon = $('td[data-source="weapon"] img').attr('data-src') || '';
     const rarityElement = $('td[data-source="rarity"]');
     const rarityName = rarityElement.find('a').attr('title').replace("Category:", "") || '';
-   // Ambil elemen gambar yang ada di dalam elemen <a> pada elemen rarity
     const rarityIcon = rarityElement.find('a img').attr('src') || ''; // Mencari <img> di dalam <a>
-    const finalRarityIcon = rarityIcon && rarityIcon.startsWith('data:image') ? '' : rarityIcon; // Cek apakah itu data URI, jika iya kosongkan
-    console.log(rarityIcon)
+    const finalRarityIcon = rarityName === '4-Stratar Resonator' ? rarityIcon : "https://static.wikia.nocookie.net/wutheringwaves/images/2/2b/Icon_5_Stars.png/revision/latest/scale-to-width-down/1000000?cb=20240429134545";
     const roleElement = $('div[data-source="role"]');
     const roles = roleElement.find('ul li a').map((_, element) => {
         return $(element).text().trim();
-    }).get(); 
+    }).get();
+
+    // Ambil data introduction hanya yang ada di Official Website
+    const introductionInfo = $('blockquote.pull-quote').filter((_, blockquote) => {
+        const citeLink = $(blockquote).find('.pull-quote__source cite a').attr('href');
+        return citeLink && citeLink.includes('wutheringwaves.kurogames.com/en/main#resonators');
+    }).find('.pull-quote__text p').text().trim().replace(/\n/g, ' ') || '';  // Menambahkan fallback string kosong jika tidak ada teks
+
+    // Ambil data quotes untuk blockquote lainnya sebagai string
+    const quotes = $('blockquote.pull-quote').not((_, blockquote) => {
+        const citeLink = $(blockquote).find('.pull-quote__source cite a').attr('href');
+        return citeLink && citeLink.includes('wutheringwaves.kurogames.com/en/main#resonators');
+    }).map((_, blockquote) => {
+        return $(blockquote).find('.pull-quote__text p').text().trim().replace(/\n/g, ' ');
+    }).get().join(' '); // Gabungkan semua quotes menjadi satu string
 
     // Ambil data tambahan yang telah dicrawling sebelumnya
     const characterData = {
@@ -24,9 +36,26 @@ module.exports = ($, url, name) => {
         affiliation: $('div[data-source="affiliation"] .pi-data-value').text().trim() || '',
         sigil: $('td[data-source="sigil"] .card-text').text().trim() || '',
         specialDish: $('td[data-source="dish"] .card-text').text().trim() || '',
-        releaseDate: $('div[data-source="releaseDate"] .pi-data-value').text().split('<br>')[0] // Mengambil bagian tanggal
-            .replace(/\s*(\d+\s*(month|year)s?\s*ago)\s*/i, '').trim() || ''
+        releaseDate: $('div[data-source="releaseDate"] .pi-data-value').html()
+            .split('<br>')[0]  // Ambil bagian sebelum <br>
+            .trim() || ''
     };
+
+    // Ambil data skills
+    const skills = [];
+    $('.navbox-list .navbox-even, .navbox-list .navbox-odd').each((_, item) => {
+        const category = $(item).find('small a').text().trim() || 'Unknown';
+        const skillName = $(item).find('.wuwa-iconwcaption a').text().trim() || 'Unknown';
+        const skillImage = $(item).find('.wuwa-iconwcaption-img img').attr('data-src') || '';
+        const skillLink = $(item).find('.wuwa-iconwcaption a').attr('href') || '';
+
+        skills.push({
+            category,
+            skillName,
+            skillImage,
+            skillLink
+        });
+    });
 
     // Ambil data voice actors
     const voiceActors = {
@@ -62,6 +91,21 @@ module.exports = ($, url, name) => {
         };
     }).get();
 
+    // Ambil data Official Name dari tabel
+    const officialName = [];
+    $('table.alternating-colors-table tbody tr').each((index, row) => {
+        if (index === 0) return;
+        const country = $(row).find('td').eq(0).text().trim().replace(/\s+/g, ' ');
+        const name = $(row).find('td').eq(1).text().trim().replace(/\s+/g, ' ');
+
+        if (country && name) {
+            officialName.push({
+                country,
+                name
+            });
+        }
+    });
+
     return {
         name,
         nickname: $('h2.pi-item[data-item-name="secondary_title"]').text().trim() || '',
@@ -83,12 +127,14 @@ module.exports = ($, url, name) => {
         birthdate: characterData.birthday,
         birthPlace: characterData.birthplace,
         affiliation: characterData.affiliation,
-        quotes: $('div.pull-quote__text p').text().trim().replace(/\n/g, ' ') || '',
+        quotes: quotes,  // Menggunakan string untuk quotes
+        introduction: introductionInfo,  // Memastikan introduction ada
         release_Date: characterData.releaseDate,
         sigil: characterData.sigil,
         specialDish: characterData.specialDish,
         voice_Actors: voiceActors,
         images: images,
-        source: url,
+        skills: skills,
+        officialName: officialName, // Tambahkan officialName ke hasil akhir
     };
 };
