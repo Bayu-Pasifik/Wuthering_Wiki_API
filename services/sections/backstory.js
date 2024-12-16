@@ -39,26 +39,46 @@ module.exports = ($, url, name) => {
 
     let currentStory = {}; // Objek sementara untuk setiap story
     storyRows.each((index, row) => {
-        // Jika menemukan elemen <th>, berarti itu bagian judul dan informasi unlock
         if ($(row).find('th').length > 0) {
             if (currentStory.title || currentStory.story) {
-                // Tambahkan cerita sebelumnya jika sudah ada data
-                characterStories.push(currentStory);
+                characterStories.push(currentStory); // Simpan cerita sebelumnya
             }
-            // Reset currentStory dan isi dengan data baru
             currentStory = {
                 title: cleanText($(row).find('th').eq(0).text()),
                 unlock_at: cleanText($(row).find('th').eq(1).text())
             };
         } else if ($(row).find('td').length > 0) {
-            // Jika menemukan elemen <td>, itu adalah konten cerita
             currentStory.story = cleanText($(row).find('td').text());
         }
     });
 
-    // Menambahkan cerita terakhir ke dalam array
     if (currentStory.title || currentStory.story) {
-        characterStories.push(currentStory);
+        characterStories.push(currentStory); // Tambahkan cerita terakhir
+    }
+
+    // Memproses cherished items
+    const characterItems = [];
+    const itemRows = $('table.article-table').eq(3).find('tbody tr');
+    let currentItem = {}; // Objek sementara untuk setiap item
+
+    itemRows.each((index, row) => {
+        if ($(row).find('th').length > 0) {
+            if (currentItem.title || currentItem.description) {
+                characterItems.push(currentItem); // Simpan item sebelumnya
+            }
+            currentItem = {
+                title: cleanText($(row).find('th').eq(0).text()),
+                unlock_at: cleanText($(row).find('th').eq(1).text())
+            };
+        } else if ($(row).find('td').length > 0) {
+            // Memasukkan deskripsi dan gambar item
+            currentItem.description = cleanText($(row).find('td').text());
+            currentItem.image = $(row).find('img').attr('data-src') || ''; // Mengambil URL gambar
+        }
+    });
+
+    if (currentItem.title || currentItem.description) {
+        characterItems.push(currentItem); // Tambahkan item terakhir
     }
 
     return {
@@ -66,7 +86,8 @@ module.exports = ($, url, name) => {
         name,
         official_introduction: introduction,
         personality: personality,
-        report: report,  // Menyimpan laporan dalam bentuk array objek
-        character_stories: characterStories // Menyimpan cerita dalam format { title, unlock_at, story }
+        report: report, 
+        character_stories: characterStories,
+        cherised_items: characterItems
     };
 };
