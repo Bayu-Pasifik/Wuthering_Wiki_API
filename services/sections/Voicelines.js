@@ -14,52 +14,82 @@ module.exports = async ($, url, name) => {
             const hasStory = $(row).find('td').length > 0;
 
             if (hasTitle) {
-                // Simpan objek sebelumnya jika ada
                 if (currentGeneralVoice) {
                     generalVoice.push(currentGeneralVoice);
                 }
 
-                // Ambil title dan requirement dari elemen <th>
                 const title = cleanText($(row).find('th.hidden span[lang="en"]').text()) || '';
                 const requirement = cleanText($(row).find('th div small i').text()) || '';
 
-                // Inisialisasi objek baru untuk cerita ini
                 currentGeneralVoice = {
                     title,
                     requirement,
-                    detail: '', // Akan diperbarui jika ditemukan dalam <td>
-                    audio: '', // Akan diperbarui jika ditemukan dalam <td>
+                    detail: '',
+                    audio: '',
                 };
             }
 
             if (hasStory && currentGeneralVoice) {
-                // Ambil detail dari elemen <td>
                 const detail = cleanText($(row).find('td span[lang="en"]').text()) || '';
                 currentGeneralVoice.detail = detail;
 
-                // Seleksi elemen <span> dengan kelas `audio-button`
                 const audioSpan = $(row).find('td span.audio-button');
-                if (audioSpan.is('no-audio')) {
-                    // Jika elemen memiliki kelas `no-audio`, set audio ke ""
-                    currentGeneralVoice.audio = '';
-                } else {
-                    // Jika tidak ada kelas `no-audio`, ambil href audio
-                    const audio = audioSpan.find('a').attr('href') || '';
-                    currentGeneralVoice.audio = audio;
-                }
+                const audio = audioSpan.find('a').attr('href') || '';
+                currentGeneralVoice.audio = audioSpan.is('no-audio') ? '' : audio;
             }
         });
 
-        // Tambahkan objek terakhir jika ada
         if (currentGeneralVoice) {
             generalVoice.push(currentGeneralVoice);
         }
 
-        // Return hasil
+        const combatVoice = [];
+        const tableCombat = $('table.wikitable').eq(1).find('tbody tr');
+
+        let currentCombatVoice = null;
+
+        tableCombat.each((index, row) => {
+            if (index === 0) return;
+
+            const mobile = $(row).find('.mobile-only');
+            if (mobile.length === 0) return;
+
+            const hasTitle = $(row).find('th').length > 0;
+            const hasStory = $(row).find('td').length > 0;
+
+            if (hasTitle) {
+                if (currentCombatVoice) {
+                    combatVoice.push(currentCombatVoice);
+                }
+
+                const title = cleanText($(row).find('th.hidden span[lang="en"]').text()) || '';
+                currentCombatVoice = {
+                    title,
+                    details: [],
+                };
+            }
+
+            if (hasStory && currentCombatVoice) {
+                const text = cleanText($(row).find('td span[lang="en"]').text()) || '';
+                const audioSpan = $(row).find('td span.audio-button');
+                const audio = audioSpan.find('a').attr('href') || '';
+
+                currentCombatVoice.details.push({
+                    text,
+                    audio: audioSpan.is('no-audio') ? '' : audio,
+                });
+            }
+        });
+
+        if (currentCombatVoice) {
+            combatVoice.push(currentCombatVoice);
+        }
+
         return {
             url,
             name,
-            generalVoiceLanes: generalVoice,
+            general_voice_lines: generalVoice,
+            combat_voice_lines: combatVoice,
         };
     } catch (error) {
         console.error(`Error extracting data: ${error.message}`);
@@ -67,6 +97,7 @@ module.exports = async ($, url, name) => {
             url,
             name,
             generalVoiceLanes: [],
+            combatVoiceLanes: [],
             error: error.message,
         };
     }
