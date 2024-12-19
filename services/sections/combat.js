@@ -1,5 +1,5 @@
 module.exports = ($, url, name) => {
-    // Helper function to clean and trim text
+    // Helper function untuk membersihkan teks
     const cleanText = (text) => {
         return (text || '').trim().replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
     };
@@ -14,7 +14,7 @@ module.exports = ($, url, name) => {
 
     // Seleksi tabel skill
     const firstTable = $('table.wikitable.skill-table'); // Pastikan tabel ini spesifik
-    const rows = firstTable.find('tbody tr');
+    const rows = firstTable.find('tbody > tr'); // Ambil hanya <tr> langsung di bawah <tbody>
     const skillData = [];
 
     rows.each((index, element) => {
@@ -29,24 +29,19 @@ module.exports = ($, url, name) => {
         // Ambil gambar icon skill
         skill.icon = $(element).find('td:nth-child(1) img').attr('data-src');
 
-        // Ambil deskripsi skill (ambil teks <td> yang tidak ada dalam <div>)
+        // Ambil deskripsi skill dari row berikutnya (hanya <td> langsung di bawah <tbody>)
         const nextRow = $(element).next();
-        
         let description = '';
 
         if (nextRow.length > 0) {
-            const nextTd = nextRow.find('td');
+            // Ambil semua <td> langsung di bawah <tr> berikutnya
+            const nextTd = nextRow.find('> td'); // Selektor `> td` memastikan hanya <td> langsung di bawah <tr>
+         
+            filteredDescription = nextTd.map((_, element) => cleanText($(element).text())).get().join(' ');
 
-            // Mengecek apakah <td> mengandung <div> atau tidak
-            nextTd.each((_, tdElement) => {
-                // Jika ada <div> di dalam <td>, abaikan <td> tersebut
-                if ($(tdElement).find('div td').length > 0) {
-                    $(tdElement).remove(); // Menghapus seluruh <td> yang mengandung <div>
-                }
-            });
+            // Replace semua teks mulai dari `12345678910` hingga akhir
+            filteredDescription = filteredDescription.replace(/12345678910.*/g, '');
 
-            // Ambil teks dari <td> setelah <div> dihapus
-            const filteredDescription = nextTd.text();
             description = cleanText(filteredDescription);
         }
 
@@ -73,6 +68,5 @@ module.exports = ($, url, name) => {
         instruction,
         additional_instruction: additionalInstruction,
         forte_skills: updatedSkillData,
-        source: url,
     };
 };
