@@ -1,16 +1,15 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 
-const getLoreData = async (name, section) => {
+const getLoreData = async (name) => {
     const baseUrl = `https://wutheringwaves.fandom.com/wiki/${name}`;
-    const url = section ? `${baseUrl}/${section}` : baseUrl;
 
     try {
-        const { data } = await axios.get(url);
+        const { data } = await axios.get(baseUrl);
         const $ = cheerio.load(data);
 
         // Dynamic import handler berdasarkan section
-        const sectionHandler = require(`./sections/${section || 'default'}.js`);
+        const sectionHandler = require(`./sections/lore/${name || './sections/lore/index'}.js`);
 
         // Panggil handler dan dapatkan data
         const loreData = await sectionHandler($, url, name);
