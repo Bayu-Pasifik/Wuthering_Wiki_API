@@ -2,38 +2,49 @@ const { cleanText } = require("../../../utils/cleanText");
 const { resizeImage } = require("../../../utils/resizeImage");
 
 module.exports = ($, url, name) => {
+    // Fungsi untuk menggabungkan beberapa paragraf
+    const getCombinedIntroduction = () => {
+        const paragraphs = [];
+        $('p').each((index, element) => {
+            const text = cleanText($(element).text());
+            if (text) {
+                paragraphs.push(text);
+            }
+        });
+
+        // Gabungkan semua paragraf yang relevan
+        return paragraphs.slice(0, 3).join(' '); // Ambil maksimal 3 paragraf pertama
+    };
+
     // Mengambil nama lokasi dari elemen dengan atribut data-source="title"
     const locationName = cleanText($('aside [data-source="title"]').text());
 
     // Mengambil data tipe lokasi dari elemen dengan atribut data-source="type"
     const locationType = cleanText($('aside [data-source="type"] .pi-data-value').text());
 
-    // Mengambil data world map
-    const worldMap = cleanText($('aside [data-source="map"] .pi-data-value').text());
-
-    // Mengambil URL gambar pertama ("From Space")
-    const imageFromSpace = $('aside .wds-tab__content.wds-is-current figure.pi-image img').attr('src');
-
-    // Mengambil URL gambar kedua ("Map") jika ada
-    const imageMap = $('aside .wds-tab__content:not(.wds-is-current) figure.pi-image img').attr('src');
-
-    // Mengambil pengantar resmi dari elemen <p> pertama
-    const introduction = cleanText($('p:first').text());
+    // Mengambil semua gambar dari elemen <aside>
+    const images = [];
+    $('aside figure.pi-image img').each((_, img) => {
+        const src = resizeImage($(img).attr('src') || null);
+        const alt = cleanText($(img).attr('alt') || null);
+        if (src) {
+            images.push({
+                url: src,
+                alt_text: alt,
+            });
+        }
+    });
 
     // Mengambil data dari tabel
     const tableData = [];
     $('table.wikitable tbody tr').each((index, row) => {
-        // Skip header row
-        if (index === 0) return;
-
+        if (index === 0) return; // Skip header row
         const columns = $(row).find('td');
         const nation = cleanText($(columns[0]).text());
         let sentinels = cleanText($(columns[1]).text());
         const capital = cleanText($(columns[2]).text());
         const headOfState = cleanText($(columns[3]).text());
         const governingBody = cleanText($(columns[4]).text());
-
-        // URL gambar nation (jika ada)
         const nationImage = $(columns[0]).find('img').attr('data-src');
 
         // Memisahkan sentinels dengan tanda koma jika mereka dempet
@@ -64,33 +75,25 @@ module.exports = ($, url, name) => {
         });
     });
 
-    // Mengambil data dari elemen <p> ke 3
-    const history = $('p').eq(3).text().trim();
-
-    //  Mengambil other languages
+    // Mengambil other languages
     const otherLanguages = [];
     $('table.article-table tbody tr').each((index, element) => {
-        if (index === 0) return;
+        if (index === 0) return; // Skip header
         const columns = $(element).find('td');
         const language = cleanText($(columns[0]).text());
         const name = cleanText($(columns[1]).text());
-        otherLanguages.push({language,name} );
+        otherLanguages.push({ language, name });
     });
 
     // Output hasil
     return {
         name: cleanText(name || locationName), // Nama diambil dari parameter atau fallback ke lokasi
-        official_introduction: introduction || null, // Jika ada pengantar resmi
+        official_introduction: getCombinedIntroduction(), // Gabungan paragraf
         type: locationType || null, // Tipe lokasi
-        world_map: worldMap || null, // Peta dunia
-        images: {
-            official: imageFromSpace || null,
-            map: imageMap || null,
-        },
-        nations: tableData,
-        history: history || null,
-        gallery: galleryItems, // Data galeri
-        other_languages: otherLanguages,
+        images: images.length ? images : null, // Semua gambar dari <aside>
+        nations: tableData.length ? tableData : null, // Tabel data (jika ada)
+        gallery: galleryItems.length ? galleryItems : null, // Data galeri (jika ada)
+        other_languages: otherLanguages.length ? otherLanguages : null,
         source_url: url, // URL sumber data
     };
 };
