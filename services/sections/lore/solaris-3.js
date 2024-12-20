@@ -84,7 +84,7 @@ module.exports = ($, url, name) => {
         type: locationType || null, // Tipe lokasi
         world_map: worldMap || null, // Peta dunia
         images: {
-            from_space: imageFromSpace || null,
+            official: imageFromSpace || null,
             map: imageMap || null,
         },
         nations: tableData,
