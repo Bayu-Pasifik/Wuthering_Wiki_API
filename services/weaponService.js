@@ -7,7 +7,7 @@ const getWeaponData = async (name) => {
     }
 
     // Ubah 'index' menjadi 'lore' untuk URL
-    const baseUrlName = name === 'index' ? 'weapons' : name;
+    const baseUrlName = name === 'index' ? 'weapons' : name==="list" ? "Weapons/List" : name;
     const baseUrl = `https://wutheringwaves.fandom.com/wiki/${baseUrlName}`;
     const sectionName = name.toLowerCase();
 
@@ -20,7 +20,10 @@ const getWeaponData = async (name) => {
         // Explicitly check for 'index' and import the correct handler
         if (sectionName === 'index') {
             sectionHandler = require('./sections/weapons/index.js');
-        } else {
+        }  else if(sectionName === 'list') {
+            sectionHandler = require('./sections/weapons/weaponList.js');
+        }
+        else  {
             try {
                 // Coba impor file sesuai section
                 const sectionPath = `./sections/weapons/${sectionName}.js`;
