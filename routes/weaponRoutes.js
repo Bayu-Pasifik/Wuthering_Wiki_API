@@ -1,15 +1,15 @@
 const express = require('express');
 const router = express.Router();
-const { getLoreData } = require('../services/loreService');
+const { getWeaponData } = require('../services/weaponService');
 
 // Jika hanya `/api/lore`
 router.get('/', async (req, res) => {
     try {
-        // Panggil `getLoreData` dengan parameter default 'index'
-        const loreData = await getLoreData('index');
+        // Panggil `getWeaponData` dengan parameter default 'index'
+        const weaponData = await getWeaponData('index');
         res.status(200).json({
             success: true,
-            loreData,
+            weaponData,
         });
     } catch (error) {
         console.error('Error:', error.message);
@@ -20,7 +20,7 @@ router.get('/', async (req, res) => {
             success: false,
             status_code: statusCode,
             error: error.message || 'An unexpected error occurred.',
-            loreData: {}, // Tetap kosong jika gagal
+            weaponData: {}, // Tetap kosong jika gagal
         });
     }
 });
@@ -31,11 +31,11 @@ router.get('/:name', async (req, res) => {
 
     try {
         // Panggil layanan untuk mendapatkan data lore
-        const loreData = await getLoreData(name);
+        const weaponData = await getWeaponData(name);
         res.status(200).json({
             success: true,
-            url: loreData.source,
-            loreData,
+            url: weaponData.source,
+            weaponData,
         });
     } catch (error) {
         console.error('Error:', error.message);
@@ -46,7 +46,7 @@ router.get('/:name', async (req, res) => {
             success: false,
             status_code: statusCode,
             error: error.message || 'An unexpected error occurred.',
-            loreData: {}, // Tetap kosong jika gagal
+            weaponData: {}, // Tetap kosong jika gagal
         });
     }
 });
