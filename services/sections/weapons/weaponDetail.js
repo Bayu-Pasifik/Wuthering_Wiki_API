@@ -12,11 +12,10 @@ module.exports = ($, url, name) => {
     $('aside figure.pi-image img').each((_, img) => {
         const src = resizeImage($(img).attr('src') || null);
         const alt = cleanText($(img).attr('alt') || null);
-            icon = {
-                url: src,
-                alt_text: alt,
-            };
-        
+        icon = {
+            url: src,
+            alt_text: alt,
+        };
     });
 
     // Ambil data rarity (kelangkaan senjata)
@@ -33,8 +32,9 @@ module.exports = ($, url, name) => {
 
     // Ambil tanggal rilis (menghapus "xxx ago")
     const releaseDate = $('div[data-source="released"] .pi-data-value').html()
-    .split('<br>')[0]  // Ambil bagian sebelum <br>
-    .trim() || ''
+        .split('<br>')[0] // Ambil bagian sebelum <br>
+        .trim() || '';
+
     // Ambil efek berdasarkan rank (1-5) dan biaya upgrade
     const effectsRank = [];
     for (let rank = 1; rank <= 5; rank++) {
@@ -53,10 +53,52 @@ module.exports = ($, url, name) => {
                 upgrade_cost: {
                     from: upgradeFrom,
                     cost: upgradeCost,
-                }, // Tambahkan upgrade cost
+                },
             });
         }
     }
+
+
+    const ascensions = [];
+
+    // Seleksi baris berdasarkan indeks ganjil atau genap
+    const statsTable = $('table.ascension-stats tbody tr');
+
+    let lastRanks = ""; // Menyimpan nilai ranks terakhir
+
+statsTable.each((index, row) => {
+    // Tentukan kelas yang akan digunakan untuk baris berdasarkan indeks
+    const rowClass = index % 2 === 0 ? 'alternating2' : 'alternating1'; // genap = alternating2, ganjil = alternating1
+    
+    // Periksa apakah baris ini memiliki kelas yang sesuai
+    if (!$(row).hasClass(rowClass)) {
+        return; // Lewati jika baris tidak sesuai kelasnya
+    }
+
+    // Periksa apakah ada <td> dengan rowspan="2" di baris ini
+    const ranksCell = $(row).find('td[rowspan="2"]');
+    if (ranksCell.length > 0) {
+        lastRanks = cleanText(ranksCell.text());
+    }
+
+    // Ambil kolom pertama untuk menentukan tipe data
+    const levelOrCost = cleanText($(row).find('td:eq(1)').text());
+    const baseAtt = cleanText($(row).find('td:eq(2)').text()); // Kolom 2
+    const secondAttck = cleanText($(row).find('td:eq(3)').text()); // Kolom 3
+
+    // Filter hanya data level (bukan Ascension Cost)
+    if (!levelOrCost.startsWith('Ascension Cost')) {
+        ascensions.push({
+            rank: lastRanks,
+            level: levelOrCost,
+            base_attack: baseAtt,
+            second_stat: secondAttck,
+        });
+    }
+});
+
+
+    
 
     // Struktur data akhir
     return {
@@ -71,5 +113,6 @@ module.exports = ($, url, name) => {
         acquisition_method: acquisitionMethod,
         release_date: releaseDate,
         effects_by_rank: effectsRank,
+        ascensions, // Tambahkan ascensions ke data akhir
     };
 };
