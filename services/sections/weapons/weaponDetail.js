@@ -80,7 +80,6 @@ statsTable.each((index, row) => {
     if (ranksCell.length > 0) {
         lastRanks = cleanText(ranksCell.text());
     }
-
     // Ambil kolom pertama untuk menentukan tipe data
     const levelOrCost = cleanText($(row).find('td:eq(1)').text());
     const baseAtt = cleanText($(row).find('td:eq(2)').text()); // Kolom 2
@@ -98,7 +97,7 @@ statsTable.each((index, row) => {
 });
 
 const materials = [];
-$('span.card-list-container div.card-container').each((index, element) => {
+$('span.card-list-container:eq(0) div.card-container').each((index, element) => {
     const name = $(element).find('.card-caption a').text().trim(); // Nama item
     const quantity = $(element).find('.card-text').text().trim(); // Jumlah item
     const imageUrl = resizeImage($(element).find('img').attr('data-src')); // URL gambar
@@ -130,6 +129,15 @@ $('.wikia-gallery-item').each((_, element) => {
         link,
     });
 });
+
+const languages = [];
+$('table.article-table:eq(1) tbody tr').each((index, element) => {
+    if (index === 0) return; // Skip header
+    const columns = $(element).find('td');
+    const language = cleanText($(columns[0]).text());
+    const name = cleanText($(columns[1]).text());
+    languages.push({ language, name });
+});
     
 
     // Struktur data akhir
@@ -147,6 +155,7 @@ $('.wikia-gallery-item').each((_, element) => {
         effects_by_rank: effectsRank,
         ascensions,
         materials,
-        gallery: images
+        gallery: images,
+        other_languages: languages
     };
 };
