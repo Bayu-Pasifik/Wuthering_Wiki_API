@@ -50,5 +50,30 @@ router.get('/:name', async (req, res) => {
         });
     }
 });
+// Tambahkan rute dinamis untuk weapon detail
+router.get('/list/:weaponName', async (req, res) => {
+    const { weaponName } = req.params;
+
+    try {
+        // Panggil layanan untuk mendapatkan data weapon detail
+        const weaponData = await getWeaponData(weaponName);
+        res.status(200).json({
+            success: true,
+            url: weaponData.source,
+            weaponData,
+        });
+    } catch (error) {
+        console.error('Error:', error.message);
+
+        const statusCode = error.status_code || 500;
+
+        res.status(statusCode).json({
+            success: false,
+            status_code: statusCode,
+            error: error.message || 'An unexpected error occurred.',
+            weaponData: {}, // Tetap kosong jika gagal
+        });
+    }
+});
 
 module.exports = router;

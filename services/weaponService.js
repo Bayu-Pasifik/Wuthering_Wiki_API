@@ -6,8 +6,8 @@ const getWeaponData = async (name) => {
         throw new Error('Invalid "name" parameter. It must be a non-empty string.');
     }
 
-    // Ubah 'index' menjadi 'lore' untuk URL
-    const baseUrlName = name === 'index' ? 'weapons' : name==="list" ? "Weapons/List" : name;
+    // Tentukan URL berdasarkan `name`
+    const baseUrlName = name === 'index' ? 'weapons' : name === 'list' ? 'Weapons/List' : name;
     const baseUrl = `https://wutheringwaves.fandom.com/wiki/${baseUrlName}`;
     const sectionName = name.toLowerCase();
 
@@ -17,21 +17,13 @@ const getWeaponData = async (name) => {
 
         let sectionHandler;
 
-        // Explicitly check for 'index' and import the correct handler
+        // Explicitly check for different sections and import the correct handler
         if (sectionName === 'index') {
             sectionHandler = require('./sections/weapons/index.js');
-        }  else if(sectionName === 'list') {
+        } else if (sectionName === 'list') {
             sectionHandler = require('./sections/weapons/weaponList.js');
-        }
-        else  {
-            try {
-                // Coba impor file sesuai section
-                const sectionPath = `./sections/weapons/${sectionName}.js`;
-                sectionHandler = require(sectionPath);
-            } catch {
-                // Fallback ke defaultHandler.js jika file tidak ditemukan
-                sectionHandler = require('./sections/weapons/defaultHandler.js');
-            }
+        } else {
+            sectionHandler = require('./sections/weapons/weaponDetail.js');
         }
 
         // Panggil handler dan dapatkan data
@@ -44,3 +36,4 @@ const getWeaponData = async (name) => {
 };
 
 module.exports = { getWeaponData };
+
