@@ -97,7 +97,39 @@ statsTable.each((index, row) => {
     }
 });
 
+const materials = [];
+$('span.card-list-container div.card-container').each((index, element) => {
+    const name = $(element).find('.card-caption a').text().trim(); // Nama item
+    const quantity = $(element).find('.card-text').text().trim(); // Jumlah item
+    const imageUrl = resizeImage($(element).find('img').attr('data-src')); // URL gambar
 
+    materials.push({
+        name,
+        quantity,
+        imageUrl,
+    });
+});
+const images = [];
+$('.wikia-gallery-item').each((_, element) => {
+    const imageElement = $(element).find('.thumb img');
+    const linkElement = $(element).find('.thumb a');
+    const captionElement = $(element).find('.lightbox-caption').clone();
+
+    // Hapus elemen <sup> dari caption
+    captionElement.find('sup').remove();
+
+    // Ambil data dari elemen
+    const image = resizeImage(imageElement.attr('data-src'));
+    const title = captionElement.text().trim();
+    const link = linkElement.attr('href');
+
+    // Masukkan data ke array hasil
+    images.push({
+        image,
+        title,
+        link,
+    });
+});
     
 
     // Struktur data akhir
@@ -113,6 +145,8 @@ statsTable.each((index, row) => {
         acquisition_method: acquisitionMethod,
         release_date: releaseDate,
         effects_by_rank: effectsRank,
-        ascensions, // Tambahkan ascensions ke data akhir
+        ascensions,
+        materials,
+        gallery: images
     };
 };
