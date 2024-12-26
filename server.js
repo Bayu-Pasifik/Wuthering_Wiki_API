@@ -6,6 +6,7 @@ const resonatorRoutes = require('./routes/resonatorRoutes');
 const loreRoutes = require('./routes/loreRoutes');
 const weaponRoutes = require('./routes/weaponRoutes');
 const factionRoutes = require('./routes/factionRoutes');
+const echoRoutes = require('./routes/echoRoutes');
 
 // Rute utama
 app.get('/', (req, res) => {
@@ -17,6 +18,8 @@ app.use('/api/resonators', resonatorRoutes);
 app.use('/api/lore', loreRoutes);
 app.use('/api/weapon', weaponRoutes);
 app.use('/api/factions',factionRoutes);
+app.use('/api/echo', echoRoutes);
+
 
 // Jalankan server
 app.listen(port, () => {
