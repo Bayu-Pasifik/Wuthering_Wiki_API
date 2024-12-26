@@ -5,10 +5,10 @@ const { getEchoesData } = require('../services/echoService');
 // Rute default untuk halaman index faction
 router.get('/', async (req, res) => {
     try {
-        const factionData = await getEchoesData('index');
+        const echoData = await getEchoesData('index');
         res.status(200).json({
             success: true,
-            factionData,
+            echoData,
         });
     } catch (error) {
         console.error('Error:', error.message);
@@ -25,11 +25,11 @@ router.get('/:name', async (req, res) => {
 
     try {
         // Panggil layanan untuk mendapatkan data lore
-        const factionData = await getEchoesData(name);
+        const echoData = await getEchoesData(name);
         res.status(200).json({
             success: true,
-            url: factionData.source,
-            factionData,
+            url: echoData.source,
+            echoData,
         });
     } catch (error) {
         console.error('Error:', error.message);
