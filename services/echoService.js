@@ -7,9 +7,10 @@ const getEchoesData = async (name) => {
         throw new Error('Invalid "name" parameter. It must be a non-empty string.');
     }
     // Tentukan URL berdasarkan `name`
-    const baseUrlName = name === 'index' ? 'Echoes' : name;
+    const baseUrlName = name === 'index' ? 'Echoes' : name === "stats" ? "Echoes/Stats": name;
     const baseUrl = `https://wutheringwaves.fandom.com/wiki/${baseUrlName}`;
     const sectionName = name.toLowerCase();
+    console.log(baseUrl)
 
     try {
         const { data } = await axios.get(baseUrl);
@@ -21,9 +22,9 @@ const getEchoesData = async (name) => {
         if (sectionName === 'index') {
             sectionHandler = require('./sections/echoes/index.js');
         } 
-        // else {
-        //     sectionHandler = require('./sections/echoes/factionDetail.js');
-        // }
+        else if(sectionName === 'stats') {
+            sectionHandler = require('./sections/echoes/stats.js');
+        }
 
         // Panggil handler dan dapatkan data
         const echoesData = await sectionHandler($, baseUrl, name);
