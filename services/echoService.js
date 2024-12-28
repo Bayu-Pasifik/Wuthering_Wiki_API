@@ -7,7 +7,7 @@ const getEchoesData = async (name) => {
         throw new Error('Invalid "name" parameter. It must be a non-empty string.');
     }
     // Tentukan URL berdasarkan `name`
-    const baseUrlName = name === 'index' ? 'Echoes' : name === "stats" ? "Echoes/Stats": name;
+    const baseUrlName = name === 'index' ? 'Echoes' : name === "stats" ? "Echoes/Stats": name === "leveling" ? "Echoes/Leveling": name;
     const baseUrl = `https://wutheringwaves.fandom.com/wiki/${baseUrlName}`;
     const sectionName = name.toLowerCase();
     console.log(baseUrl)
@@ -24,6 +24,8 @@ const getEchoesData = async (name) => {
         } 
         else if(sectionName === 'stats') {
             sectionHandler = require('./sections/echoes/stats.js');
+        } else if(sectionName === 'leveling') {
+            sectionHandler = require('./sections/echoes/leveling.js');
         }
 
         // Panggil handler dan dapatkan data
