@@ -9,8 +9,8 @@ module.exports = ($, url, name) => {
     const rarity = aside.find('td[data-source="rarity"] img').map((i, el) => ({
         rarity: $(el).attr('title'),
         image: $(el).attr('src').includes("data:image/gif")
-            ? $(el).attr('data-src')
-            : $(el).attr('src'),
+            ? resizeImage($(el).attr('data-src'))
+            : resizeImage($(el).attr('src')),
     })).get();
 
     const category = aside.find('div[data-source="class"] .pi-data-value').text().trim().split(' ')[0];
