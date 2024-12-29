@@ -1,4 +1,4 @@
-const { cleanText } = require("../../utils/cleanText");
+const { cleanText } = require("../../../utils/cleanText");
 
 module.exports = async ($, url, name) => {
     try {

@@ -3,16 +3,25 @@ const cheerio = require('cheerio');
 
 // Fungsi untuk mendapatkan data resonator
 const getResonatorData = async (name, section) => {
-    const baseUrl = `https://wutheringwaves.fandom.com/wiki/${name}`;
+    if (!name || typeof name !== 'string') {
+        throw new Error('Invalid "name" parameter. It must be a non-empty string.');
+    }
+    const baseUrlName = name === 'list' ? 'Resonator' : name;
+    const baseUrl = `https://wutheringwaves.fandom.com/wiki/${baseUrlName}`;
     const url = section ? `${baseUrl}/${section}` : baseUrl;
 
     try {
         const { data } = await axios.get(url);
         const $ = cheerio.load(data);
+        
+        let sectionHandler;
+        if(name === 'list') {
+            sectionHandler = require('./sections/resonators/list.js');
+        } else{
 
+            sectionHandler = require(`./sections/resonators/${section || 'default'}.js`);
+        }
         // Dynamic import handler berdasarkan section
-        const sectionHandler = require(`./sections/${section || 'default'}.js`);
-
         // Panggil handler dan dapatkan data
         const resonatorData = await sectionHandler($, url, name);
 
