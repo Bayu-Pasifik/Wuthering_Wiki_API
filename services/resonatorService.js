@@ -9,7 +9,7 @@ const getResonatorData = async (name, section) => {
     const baseUrlName = name === 'list' ? 'Resonator' : name;
     const baseUrl = `https://wutheringwaves.fandom.com/wiki/${baseUrlName}`;
     const url = section ? `${baseUrl}/${section}` : baseUrl;
-
+    section = section.toLowerCase();
     try {
         const { data } = await axios.get(url);
         const $ = cheerio.load(data);
