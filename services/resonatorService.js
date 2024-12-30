@@ -1,5 +1,6 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
+const path = require('path');
 
 // Fungsi untuk mendapatkan data resonator
 const getResonatorData = async (name, section) => {
@@ -28,12 +29,11 @@ const getResonatorData = async (name, section) => {
 
         // Tentukan handler berdasarkan section
         if (name === 'list') {
-            sectionHandler = require('./sections/resonators/list.js');
-        } else if(section === 'voicelines') {
-            sectionHandler = require('./sections/resonators/voicelines.js');
-        }
-        else {
-            sectionHandler = require(`./sections/resonators/${section || 'default'}.js`);
+            sectionHandler = require(path.resolve(__dirname, './sections/resonators/list.js'));
+        } else if (section === 'voicelines') {
+            sectionHandler = require(path.resolve(__dirname, './sections/resonators/voicelines.js'));
+        } else {
+            sectionHandler = require(path.resolve(__dirname, `./sections/resonators/${section || 'default'}.js`));
         }
 
         // Panggil handler dan dapatkan data
