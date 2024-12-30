@@ -18,6 +18,7 @@ const getResonatorData = async (name, section) => {
     }
     console.log("Section:", section);
     console.log("URL:", url);
+    console.log("Name:", name);
 
     try {
         const { data } = await axios.get(url);
@@ -28,7 +29,10 @@ const getResonatorData = async (name, section) => {
         // Tentukan handler berdasarkan section
         if (name === 'list') {
             sectionHandler = require('./sections/resonators/list.js');
-        } else {
+        } else if(section === 'voicelines') {
+            sectionHandler = require('./sections/resonators/voicelines.js');
+        }
+        else {
             sectionHandler = require(`./sections/resonators/${section || 'default'}.js`);
         }
 
