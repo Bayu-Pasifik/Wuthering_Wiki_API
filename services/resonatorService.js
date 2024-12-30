@@ -6,22 +6,30 @@ const getResonatorData = async (name, section) => {
     if (!name || typeof name !== 'string') {
         throw new Error('Invalid "name" parameter. It must be a non-empty string.');
     }
+
+    // Perbaiki case "gallery" -> "Gallery" untuk URL
     const baseUrlName = name === 'list' ? 'Resonator' : name;
     const baseUrl = `https://wutheringwaves.fandom.com/wiki/${baseUrlName}`;
-    const url = section ? `${baseUrl}/${section}` : baseUrl;
-    section = section.toLowerCase();
+    const url = section ? `${baseUrl}/${section.charAt(0).toUpperCase() + section.slice(1)}` : baseUrl;
+
+    // Pastikan section lowercase sebelum digunakan
+    if (section) {
+        section = section.toLowerCase(); // Menggunakan toLowerCase dengan "C" besar
+    }
+
     try {
         const { data } = await axios.get(url);
         const $ = cheerio.load(data);
-        
-        let sectionHandler;
-        if(name === 'list') {
-            sectionHandler = require('./sections/resonators/list.js');
-        } else{
 
+        let sectionHandler;
+
+        // Tentukan handler berdasarkan section
+        if (name === 'list') {
+            sectionHandler = require('./sections/resonators/list.js');
+        } else {
             sectionHandler = require(`./sections/resonators/${section || 'default'}.js`);
         }
-        // Dynamic import handler berdasarkan section
+
         // Panggil handler dan dapatkan data
         const resonatorData = await sectionHandler($, url, name);
 
