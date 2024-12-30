@@ -31,7 +31,7 @@ const getResonatorData = async (name, section) => {
         if (name === 'list') {
             sectionHandler = require(path.resolve(__dirname, './sections/resonators/list.js'));
         } else if (section === 'voicelines') {
-            sectionHandler = require(path.resolve(__dirname, './sections/resonators/voicelines.js'));
+            sectionHandler = require(path.resolve(__dirname, './sections/resonators/voice.js'));
         } else {
             sectionHandler = require(path.resolve(__dirname, `./sections/resonators/${section || 'default'}.js`));
         }
