@@ -16,6 +16,8 @@ const getResonatorData = async (name, section) => {
     if (section) {
         section = section.toLowerCase(); // Menggunakan toLowerCase dengan "C" besar
     }
+    console.log("Section:", section);
+    console.log("URL:", url);
 
     try {
         const { data } = await axios.get(url);
