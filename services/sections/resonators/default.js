@@ -8,8 +8,9 @@ module.exports = ($, url, name) => {
    // Untuk rarityName
     const rarityName = rarityElement.find('a').attr('title') ? 
     rarityElement.find('a').attr('title').replace("Category:", "") : '';
-    const rarityIcon = rarityElement.find('a img').attr('src') || ''; // Mencari <img> di dalam <a>
-    const finalRarityIcon = rarityName === '4-Stratar Resonator' ? rarityIcon : "https://static.wikia.nocookie.net/wutheringwaves/images/2/2b/Icon_5_Stars.png/revision/latest/scale-to-width-down/1000000?cb=20240429134545";
+    const rarityIcon = rarityElement.find('a img').attr('src') || '';
+    console.log(rarityIcon);
+    const finalRarityIcon = rarityName === '4-Star Resonators' ? rarityIcon : "https://static.wikia.nocookie.net/wutheringwaves/images/2/2b/Icon_5_Stars.png/revision/latest/scale-to-width-down/1000000?cb=20240429134545";
     const roleElement = $('div[data-source="role"]');
     const roles = roleElement.find('ul li a').map((_, element) => {
         return $(element).text().trim();
